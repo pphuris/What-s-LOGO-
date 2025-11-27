@@ -3,88 +3,89 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>เกมทายรูปแบบ 2x2</title>
+<title>WHAT'S THE REAL LOGO?</title>
 <style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    margin: 0;
-    background: #f9f9f9;
-    padding: 20px;
-  }
+	body {
+	  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	  display: flex;
+	  flex-direction: column;
+	  align-items: center;
+	  justify-content: flex-start;
+	  min-height: 100vh;
+	  margin: 0;
+	  padding: 30px 20px;
+	  background-color: #EAF2F8; /* สีพื้นหลังฟ้าอ่อน */
+	}
 
-  h1 {
-    font-size: 28px;
-    margin-bottom: 30px;
-    color: #333;
-    text-align: center;
-  }
+	/* คำถาม */
+	h1#question-text {
+	  font-size: 26px;
+	  color: #1a1a1a;
+	  margin-bottom: 25px;
+	  text-align: center;
+	  font-weight: 600;
+	}
 
-  .answers {
-    display: grid;
-    grid-template-columns: 150px 150px;
-    grid-template-rows: 150px 150px;
-    gap: 20px;
-  }
+	/* กริดคำตอบ 2x2 */
+	.answers {
+	  display: grid;
+	  grid-template-columns: repeat(2, 150px);
+	  grid-template-rows: repeat(2, 150px);
+	  gap: 20px;
+	}
 
-  .answer-btn {
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s, box-shadow 0.2s, border 0.2s;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-  }
+	/* ปุ่มคำตอบสี่เหลี่ยมพาสเทล */
+	.answer-btn {
+	  border: none;
+	  border-radius: 15px;
+	  cursor: pointer;
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  transition: 0.2s ease;
+	  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+	}
 
-  .answer-btn img {
-    max-width: 80%;
-    max-height: 80%;
-    object-fit: contain;
-  }
+	/* สีปุ่มแต่ละตัวอย่าง */
+	.answer-btn.bg-pink { background-color: #FADBD8; }
+	.answer-btn.bg-blue { background-color: #D6EAF8; }
+	.answer-btn.bg-green { background-color: #D5F5E3; }
+	.answer-btn.bg-orange { background-color: #FCF3CF; }
 
-  .answer-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
-  }
+	.answer-btn img {
+	  width: 60%;
+	  height: 60%;
+	  object-fit: contain;
+	}
 
-  .answer-btn.correct {
-    border: 4px solid #28a745;
-  }
+	/* Hover */
+	.answer-btn:hover {
+	  transform: scale(1.05);
+	  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+	}
 
-  .answer-btn.wrong {
-    border: 4px solid #dc3545;
-    opacity: 0.6;
-  }
+	/* แสดงถูก/ผิด */
+	.answer-btn.correct { border: 4px solid #28a745; }
+	.answer-btn.wrong { border: 4px solid #dc3545; opacity: 0.7; }
 
-  #score {
-    margin-top: 30px;
-    font-size: 22px;
-    font-weight: bold;
-    color: #333;
-  }
+	/* Score แถบด้านล่าง */
+	#score {
+	  margin-top: 30px;
+	  padding: 10px 25px;
+	  font-size: 20px;
+	  font-weight: 500;
+	  color: #1a1a1a;
+	  border-radius: 12px;
+	  background-color: #E1E8F0; /* สีคล้ายพื้น แต่เข้มกว่าเล็กน้อย */
+	}
 
-  @media (max-width: 500px) {
-    .answers {
-      grid-template-columns: 120px 120px;
-      grid-template-rows: 120px 120px;
-      gap: 15px;
-    }
-  }
 </style>
 </head>
 <body>
 
 <h1 id="question-text">คำถามที่นี่</h1>
 <div class="answers" id="answers-container"></div>
-<div id="score">คะแนน: 0</div>
+<div id="score">Score: 0</div>
 
 <script>
 // ตัวอย่างคำถาม Text + คำตอบเป็นรูป (Base64)
@@ -110,13 +111,18 @@ const questions = [
   },
 ];
 
+// ก่อนหน้า
+// let currentQuestionIndex = 0;
+
+// สุ่มคำถาม
+let shuffledQuestions = questions.sort(() => 0.5 - Math.random());
 let currentQuestionIndex = 0;
 let score = 0;
 let startTime;
 
 function showQuestion(index) {
   startTime = new Date().getTime();
-  const q = questions[index];
+  const q = shuffledQuestions[index]; // ใช้ shuffledQuestions แทน questions
   document.getElementById('question-text').textContent = q.text;
   const container = document.getElementById('answers-container');
   container.innerHTML = '';
@@ -124,53 +130,32 @@ function showQuestion(index) {
   // สุ่มตำแหน่งคำตอบ
   const options = q.answers.sort(() => 0.5 - Math.random());
 
-	options.forEach(opt => {
-	  const btn = document.createElement('button');
-	  btn.classList.add('answer-btn');
-	  btn.style.backgroundColor = opt.bg;
-	  btn.innerHTML = `<img src="${opt.img}" alt="คำตอบ">`;
-	  btn.correct = opt.correct; // <-- เพิ่มตรงนี้
-	  btn.onclick = () => checkAnswer(opt.correct, btn, options);
-	  container.appendChild(btn);
-	});
+  const colorClasses = ["bg-pink", "bg-blue", "bg-green", "bg-orange"];
 
-}
+  options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.classList.add('answer-btn');
 
-function checkAnswer(isCorrect, btn, options) {
-  const endTime = new Date().getTime();
-  const timeTaken = (endTime - startTime) / 1000;
+    // ใส่สีจาก colorClasses โดยวนซ้ำถ้ามากกว่า 4 ตัวเลือก
+    btn.classList.add(colorClasses[i % colorClasses.length]);
 
-  const allButtons = document.querySelectorAll('.answer-btn');
+    btn.innerHTML = `<img src="${opt.img}" alt="คำตอบ">`;
+    btn.correct = opt.correct;
+    btn.onclick = () => checkAnswer(opt.correct, btn, options);
 
-  allButtons.forEach(b => {
-    b.onclick = null; // ป้องกันกดซ้ำ
-    if(b.correct) {
-      b.classList.add('correct'); // แสดงคำตอบถูก
-    } 
-    if(b === btn && !isCorrect) {
-      b.classList.add('wrong'); // แสดงคำตอบผิด
-    }
+    container.appendChild(btn);
   });
-
-  if(isCorrect) {
-    const point = Math.max(10 - Math.floor(timeTaken), 1);
-    score += point;
-  }
-
-  document.getElementById('score').textContent = `คะแนน: ${score}`;
-
-  setTimeout(() => nextQuestion(), 1500);
 }
-
 
 function nextQuestion() {
   currentQuestionIndex++;
-  if(currentQuestionIndex < questions.length) {
+  if(currentQuestionIndex < shuffledQuestions.length) {
     showQuestion(currentQuestionIndex);
   } else {
     alert(`จบเกม! คะแนนรวม: ${score}`);
   }
 }
+
 
 // เริ่มเกม
 showQuestion(currentQuestionIndex);
